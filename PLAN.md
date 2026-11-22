@@ -31,13 +31,27 @@ Es el espejo en Internet Archive del Gutenberg eBook #57303; el texto coincide c
 
 ## Reparto resumido: quién hace qué
 
-> Las tareas `T0`–`T4` ya están implementadas por el asistente, pero **los dos deben poder explicarlas** en la defensa oral de 10 minutos. El reparto siguiente aplica al trabajo que queda y a la responsabilidad de cada uno sobre el entregable.
+> Este cuadro cubre **todas las fases (1–7)**. Las marcadas ✅ ya están implementadas por el asistente; las marcadas ⚠️ son las que faltan. En la defensa oral de 10 minutos, **los dos deben poder explicar cualquier fase**, incluso la que no programó.
 
 | Integrante | Código / experimentos | Reporte | Entregables propios |
 |---|---|---|---|
-| **Persona A (tú)** | **Fase 2** (`T2.csv`): MLE, ceros, log-verosimilitud y perturbaciones.<br>**Fase 4** (`T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`): elección de `n`, Gibbs, promedio acumulado.<br>**Fase 6** (`T4.csv`): bootstrap por bloques. | **R1**: portada, resumen, Introducción, Marco probabilístico y Datos (T1/F1).<br>**R3**: mitad de la Discusión.<br>**R4**: Conclusiones, Referencias, Anexo A, Anexo B, Anexo C. | `T2.csv`, `T3.csv`, `T4.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`, secciones 1–3 y 8 del reporte. |
-| **Persona B (compañero)** | **Fase 3** (`F2.pdf`): suavizado y elección de `α`.<br>**Fase 5** (`F5.pdf`): matriz `P`, $\pi$, muestras con semilla.<br>**Fase 7 opcional** (+10): BPE y BPC por carácter. | **R2**: Métodos, Resultados (T2–T4 y F2–F5 citados) y Verificaciones.<br>**R3**: otra mitad de la Discusión.<br>**R5**: armar el zip y probar reproducibilidad. | `F2.pdf`, `F5.pdf`, Anexo C (muestras), secciones 4–6 del reporte, zip final. |
-| **Ambos** | `T4` (`modelos.py`) ya compartida: cualquiera puede modificarla, pero avisando al otro. | Revisión cruzada de todo el reporte; tabla de contribución al final; Anexo C con la declaración de IA. | Sincronización y coherencia de cifras. |
+| **Persona A (tú)** | **Fase 1** (`T1.csv`, `F1.pdf`) ✅ ya hecha: limpieza, normalización y partición.<br>**Fase 2** (`T2.csv`) ⚠️: MLE, ceros, log-verosimilitud y perturbaciones.<br>**Fase 4** (`T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`) ⚠️: elección de `n`, Gibbs, promedio acumulado.<br>**Fase 6** (`T4.csv`) ⚠️: bootstrap por bloques. | **R1**: portada, resumen, Introducción, Marco probabilístico y Datos (T1/F1).<br>**R3**: mitad de la Discusión.<br>**R4**: Conclusiones, Referencias, Anexo A, Anexo B, Anexo C. | `T1.csv`, `F1.pdf`, `T2.csv`, `T3.csv`, `T4.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`, secciones 1–3 y 8 del reporte. |
+| **Persona B (compañero)** | **Fase 3** (`F2.pdf`) ⚠️: suavizado y elección de `α`.<br>**Fase 5** (`F5.pdf`) ⚠️: matriz `P`, $\pi$, muestras con semilla.<br>**Fase 7 opcional** (+10) ⚠️: BPE y BPC por carácter. | **R2**: Métodos, Resultados (T2–T4 y F2–F5 citados) y Verificaciones.<br>**R3**: otra mitad de la Discusión.<br>**R5**: armar el zip y probar reproducibilidad. | `F2.pdf`, `F5.pdf`, Anexo C (muestras), secciones 4–6 del reporte, zip final. |
+| **Ambos** | `T3` (`pruebas.py`) y `T4` (`modelos.py`) ✅ ya compartidas: cualquiera puede modificarlas, pero avisando al otro. | Revisión cruzada de todo el reporte; tabla de contribución al final; Anexo C con la declaración de IA. | Sincronización y coherencia de cifras. |
+
+**Mapa completo por fase — ninguna queda fuera**
+
+| Fase | Responsable | Estado | Entregable principal |
+|---|---|---|---|
+| 1. Explorar corpus | A | ✅ Hecha | `T1.csv`, `F1.pdf`, `datos/corpus/` |
+| 2. MLE y ceros | A | ⚠️ Pendiente | `T2.csv` |
+| 3. Suavizado y `α` | B | ⚠️ Pendiente | `F2.pdf` |
+| 4. Prueba, Gibbs y métricas | A | ⚠️ Pendiente | `T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv` |
+| 5. Simulación y $\pi$ | B | ⚠️ Pendiente | `F5.pdf`, muestras del Anexo C |
+| 6. Bootstrap | A | ⚠️ Pendiente | `T4.csv` |
+| 7. BPE (opcional, +10) | B | ⚠️ Pendiente | BPC por carácter |
+| Verificaciones | Ambos | ✅ Hechas | `pruebas.py` |
+| Reporte R1–R5 | A + B | ⚠️ Pendiente | `reporte.pdf` y zip |
 
 **Reglas de coordinación**
 
