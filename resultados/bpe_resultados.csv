@@ -1,0 +1,13 @@
+metrica,valor,unidad
+fusiones_bpe,200,fusiones
+vocabulario_tokens,1900,tokens
+tokens_nuevos_val_prueba,107,tokens
+alpha_elegido_validacion,0.03,sin unidad
+tokens_train,209817,tokens
+tokens_prueba,26178,tokens
+caracteres_prueba,66879,caracteres
+bpc_caracter_bpe,2.427847,bits/caracter
+mejor_n_fase4,5,orden
+bpc_caracter_fase4,2.153786,bits/caracter
+diferencia_bpe_menos_fase4,0.274061,bits/caracter
+metricas_prueba_csv_reescrito,0,booleano

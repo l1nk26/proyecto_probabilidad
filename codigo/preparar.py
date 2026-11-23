@@ -12,8 +12,12 @@ from __future__ import annotations
 import csv
 import json
 import math
+import os
 import re
 from pathlib import Path
+
+# Misma fecha fija que experimentos.py: F1 es byte-idéntico al repetir.
+os.environ.setdefault("SOURCE_DATE_EPOCH", "1795392000")
 
 import matplotlib
 matplotlib.use("Agg")
@@ -107,6 +111,7 @@ def main() -> None:
     ax.tick_params(axis="x", rotation=90)
     fig.tight_layout()
     fig.savefig(RESULTADOS / "F1.pdf")
+    fig.savefig(RESULTADOS / "F1.png", dpi=150)
     plt.close(fig)
 
     print(f"Corpus limpio: {len(limpio)} caracteres")

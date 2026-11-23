@@ -6,57 +6,323 @@
 \renewcommand{\baselinestretch}{1.15}
 \pagenumbering{arabic}
 
-\title{Modelos de lenguaje de n-gramas sobre caracteres: \\
+\title{Modelos de lenguaje de n-gramas sobre caracteres:\\
        predicción en \emph{La Divina Comedia}}
-\author{Equipo NN \\ Integrante A \\ Integrante B}
+\author{Equipo NN\\ Integrante A \quad Integrante B}
 \date{Noviembre de 2026}
 
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+\centering
+{\Large \bfseries Modelos de lenguaje de n-gramas sobre caracteres}\\[0.6cm]
+{\large Predicción en \emph{La Divina Comedia}}\\[1.2cm]
+Proyecto P1 --- Probabilidad (S01)\\[0.4cm]
+Equipo NN\\[0.2cm]
+Integrante A: \underline{\hspace{4.5cm}}\quad Integrante B: \underline{\hspace{4.5cm}}\\[0.8cm]
+Noviembre de 2026
+
+\vfill
+\textit{Borrador de trabajo: las secciones marcadas como
+``Por completar: Persona B'' están pendientes de integración.}
+\end{titlepage}
 
 \begin{abstract}
-Resumen pendiente: pregunta, datos, método y resultado principal
-(mejor $n$, BPC de prueba e intervalo bootstrap). Máximo 200 palabras.
+Estimamos modelos de $n$-gramas de caracteres ($n=1,\dots,5$) sobre una traducción
+al español de \emph{La Divina Comedia} (668\,786 caracteres normalizados). La
+partición contigua 80/10/10 fija el vocabulario solo con entrenamiento
+($\vert\mathcal{V}\vert=35$). El suavizado aditivo se eligió con validación; el
+bloque de prueba se evaluó una sola vez. La validación seleccionó $n=5$ con
+$\alpha=0.03$; en prueba el BPC fue $2.1538$ bits/carácter y la perplejidad
+$4.4499$. La comparación $n=5$ frente a $n=4$ dio $\Delta=-0.1518$ bits con
+intervalo bootstrap del 95\,\% $[-0.1632,-0.1410]$ (34 bloques de 2000,
+10\,000 remuestras), que excluye el cero. El promedio acumulado de
+$-\log_2\hat q$ se estabilizó en la figura F4 y la desigualdad de Gibbs se
+cumplió con $KL=0.0016$ bits. El trabajo separa verificaciones exactas de
+resultados ilustrativos y concluye que el orden superior captura dependencias
+locales sin sobreajuste apreciable en este corpus.
 \end{abstract}
 
 \section{Introducción}
-Pendiente.
+
+Predecir el siguiente carácter de un texto es el ejemplo más directo de un
+modelo de lenguaje: la probabilidad de una cadena se factoriza, por la regla de
+la cadena (Prop.\ 1.1.3), en el producto de condicionales de cada símbolo dado
+su contexto inmediato. Cuando el contexto se limita a los $n-1$ caracteres
+anteriores obtenemos una cadena de Markov de orden $n-1$ (Def.\ 1.1.6). El
+proyecto pregunta cuál de esos órdenes predice mejor un texto español real,
+cómo debe suavizarse y cuánta incertidumbre tiene la comparación.
+
+Trabajamos con la traducción de Manuel Aranda y Sanjuán de \emph{La Divina
+Comedia}, descargada de Internet Archive el 21 de noviembre de 2026. El texto
+crudo se normalizó y se dividió en tres bloques contiguos. Todas las decisiones
+de modelo ---el par $(n,\alpha)$--- se tomaron con el bloque de validación; el
+bloque de prueba se reservó para una evaluación final. Este protocolo es el
+que permite reportar una cifra de prueba sin haberla usado para elegir.
+
+Los aportes de este borrador son: (i) la medición del corpus y la prueba de
+cordura reproducible; (ii) los conteos MLE y la aparición de probabilidades
+cero; (iii) la evaluación única en prueba con verificación de Gibbs; y (iv) un
+intervalo bootstrap por bloques para la diferencia entre los dos mejores
+modelos.
 
 \section{Marco probabilístico}
-Pendiente: Def.\ 1.1.1, Prop.\ 1.1.3, Def.\ 1.1.6, Prop.\ 1.1.8,
-Prop.\ 1.1.14, Props.\ 1.1.15--1.1.18, Def.\ 1.1.20, Teo.\ 1.1.27,
-Def.\ 1.1.44.
+
+Sea $\mathcal{V}$ el alfabeto finito de símbolos (Def.\ 1.1.1); aquí
+$\vert\mathcal{V}\vert=35$. Escribimos $x_{1:T}$ para una cadena de caracteres
+y $x_{t-n+1:t-1}$ para su contexto de longitud $n-1$. La regla de la cadena
+(Prop.\ 1.1.3) da $q(x_{1:T})=\prod_t q(x_t\mid x_{1:t-1})$; el modelo de
+$n$-gramas (Def.\ 1.1.6) sustituye ese contexto por los $n-1$ caracteres
+previos, suponiendo Markov de orden $n-1$.
+
+La MLE (Prop.\ 1.1.8) estima cada condicional por su frecuencia relativa:
+\begin{equation}
+  \hat q(y\mid h)=\frac{c(h,y)}{c(h)} ,
+\end{equation}
+donde $c(h,y)$ cuenta las veces que $y$ sigue al contexto $h$ en entrenamiento
+y $c(h)=\sum_{y\in\mathcal{V}}c(h,y)$. Si un par no aparece, la MLE asigna
+probabilidad cero. El suavizado aditivo (Prop.\ 1.1.14) corrige esto:
+\begin{equation}
+  \hat q_\alpha(y\mid h)=\frac{c(h,y)+\alpha}{c(h)+\alpha\vert\mathcal{V}\vert},
+  \qquad \alpha=0 \text{ es la MLE}. \tag{2}
+\end{equation}
+
+La entropía de una distribución es $H(p)=-\sum_i p_i\log_2 p_i$ y satisface
+$H(p)\le\log_2\vert\mathcal{V}\vert$ (Prop.\ 1.1.15), con igualdad solo si
+todos los símbolos son equiprobables. La entropía cruzada o costo medio de
+codificar con $q$ datos de $p$ es $H(p,q)=-\sum_i p_i\log_2 q_i$, y la
+desigualdad de Gibbs (Teo.\ 1.1.27) afirma $H(p)\le H(p,q)$; la diferencia es
+la divergencia de Kullback--Leibler $D_{\mathrm{KL}}(p\|q)$ (Def.\ 1.1.17).
+En el modelado de caracteres se reporta
+\begin{equation}
+  \mathrm{BPC}=-\frac{1}{N_e}\sum_t\log_2\hat q_\alpha(x_t\mid h_t),
+  \qquad \mathrm{PPL}=2^{\mathrm{BPC}}, \tag{3}
+\end{equation}
+donde $N_e$ es el número de caracteres evaluados (Def.\ 1.1.20). El BPC es una
+entropía cruzada empírica y la PPL su exponencial en base 2.
+
+Finalmente, el bootstrap (Def.\ 1.1.44) remuestrea con reemplazo unidades
+consideradas independientes para aproximar la distribución de un estadístico.
+Aquí las unidades son bloques contiguos, no caracteres, porque la cadena de
+Markov introduce dependencia entre posiciones vecinas. La distribución
+estacionaria $\pi$ de una matriz de transición positiva se obtiene por
+iteración de potencias $\pi_0P^t$ (Teo.\ 1.1.40); ese análisis corresponde a la
+Fase 5, a cargo de Persona B.
 
 \section{Datos}
-Pendiente: T1 y F1, normalización y partición 80/10/10.
+
+La fuente es \emph{La Divina Comedia}, Dante Alighieri, traducción de Manuel
+Aranda y Sanjuán (Barcelona, 1871), descargada de
+\texttt{https://archive.org/details/ladivinacomedia57303gut} el 21 de
+noviembre de 2026. El archivo es texto plano en CP1252 y coincide con el
+Gutenberg eBook \#57303; los detalles de procedencia están en
+\texttt{datos/FUENTE.md}. El script \texttt{preparar.py} recorta el poema entre
+\texttt{\_CANTO PRIMERO\_} y \texttt{\_INDICE\_}, elimina encabezados,
+ilustraciones y notas, convierte a minúsculas, sustituye por un único símbolo
+\# todo carácter fuera del alfabeto, colapsa espacios y fija $\mathcal{V}$ solo
+sobre entrenamiento.
+
+La tabla T1 resume la partición contigua: entrenamiento $535\,028$ caracteres,
+validación $66\,879$ y prueba $66\,879$ ($668\,786$ en total), con
+$\vert\mathcal{V}\vert=35$. La figura F1 muestra las frecuencias ordenadas de
+unigramas. La entropía de las frecuencias de entrenamiento es
+$H(\hat p)=4.1992$ bits, mientras que el máximo posible es
+$\log_2 35=5.1293$ bits. La diferencia de $0.9301$ bits mide cuánto se aleja el
+texto de un sorteo uniforme sobre el alfabeto: el español usa de forma muy
+desigual las letras y, sobre todo, el espacio. En términos relativos la
+entropía observada es aproximadamente $81.8\,\%$ del máximo, por lo que el texto está lejos
+de ser aleatorio, aunque aún conserva casi un bit de incertidumbre por símbolo
+bajo el modelo unigramas.
 
 \section{Métodos}
-Pendiente.
+
+\textbf{[Por completar: Persona B]} Debe describir los conteos, el suavizado,
+la selección de $\alpha$ con F2, las métricas, la simulación y el bootstrap,
+con suficiente detalle para repetirlos.
 
 \section{Resultados}
-Pendiente: T2--T4 y F2--F5, citadas y comentadas.
+
+\textbf{[Por completar: Persona B]} Debe citar y comentar T2--T4 y F2--F5.
+Los archivos T2, T3, T4, F3 y F4 ya están generados; F2 y F5 dependen de la
+Persona B.
 
 \section{Verificaciones}
-Pendiente: \texttt{abracadabra}, sumas, Gibbs y convergencia de $\pi$.
 
-\section{Discusión y limitaciones}
-Pendiente: responder las preguntas en cursiva del enunciado.
+\textbf{[Por completar: Persona B]} Debe reportar la salida de
+\texttt{pruebas.py}: los seis valores de \emph{abracadabra}, las sumas
+condicionales, Gibbs y la convergencia de $\pi$.
+
+\section{Discusión}
+
+\subsection{Distancia al azar (Fase 1)}
+
+La comparación $H(\hat p)=4.1992$ frente a $\log_2 35=5.1293$ bits no significa
+que el texto ``contenga'' menos información que una cadena aleatoria: significa
+que la distribución empírica de símbolos es más concentrada. Codificando con un
+modelo uniforme se gastarían $5.1293$ bits por carácter; usando las frecuencias
+reales se gastan $4.1992$, un ahorro de $0.9301$ bits por símbolo. El modelo
+deberá explotar además la dependencia entre caracteres, que es lo que miden los
+BPC de T3.
+
+\subsection{Conteos MLE y probabilidades cero (Fase 2)}
+
+La tabla T2 muestra que el número de contextos distintos crece de $1$ ($n=1$) a
+$23\,672$ ($n=5$), mientras que la fracción de caracteres de validación con
+probabilidad cero bajo la MLE sube de $0$ a $0.0391$. El BPC de la MLE en
+validación es infinito en cuanto aparece un solo cero porque el BPC promedia
+$-\log_2\hat q$ y $-\log_2 0=+\infty$; un solo evento imposible domina la media
+por completo. Esto no es un defecto de la métrica sino una consecuencia de
+haber asignado probabilidad cero a un evento que sí ocurrió.
+
+Los ceros crecen con $n$ porque el espacio de contextos posibles crece como
+$\vert\mathcal{V}\vert^{n-1}$ y las $535\,028$ posiciones de entrenamiento no
+pueden cubrirlo. Aunque los contextos realmente observados son muchos, las
+transiciones rara vez se repiten: para $n=5$ hay $66\,833$ pares observados
+repartidos entre $23\,672$ contextos, es decir, menos de tres sucesos por
+contexto. La perturbación de $0.01$ de probabilidad en un contexto frecuente
+confirmó la Prop.\ 1.1.8: en los cinco órdenes la MLE tuvo mayor
+log-verosimilitud que las dos alternativas perturbadas.
+
+\subsection{Elección de orden y evaluación en prueba (Fase 4)}
+
+La validación eligió $n=5$ ($\alpha=0.03$) porque dio el menor BPC de
+validación, $2.1838$ bits, frente a $4.2000$, $3.2689$, $2.7432$ y $2.3362$ de
+los órdenes $1$ a $4$. La prueba, evaluada una sola vez, confirma el mismo
+orden: los BPC de T3 decrecen monótonamente hasta $2.1538$ bits en $n=5$ y la
+perplejidad correspondiente es $4.4499$. Por tanto, la prueba no contradice la
+selección de validación.
+
+En cambio, el BPC de entrenamiento sigue bajando hasta $1.8482$ bits en $n=5$.
+La explicación es la misma que en cualquier modelo con muchos parámetros: al
+crecer $n$, cada condicional se estima con menos datos y se ajusta a
+idiosincrasias del entrenamiento. Validación y prueba pagan ese coste y por eso
+su curva se aplana. La figura F3 muestra ambas curvas en la misma escala y la
+figura F4 muestra que el promedio acumulado de $-\log_2\hat q$ se estabiliza,
+como predice la ley de los grandes números. La desigualdad de Gibbs también se
+cumplió con el modelo unigramas: $H(\hat p_{\mathrm{prueba}})=4.1909\le
+H(\hat p_{\mathrm{prueba}},\hat q)=4.1925$, con $KL=0.0016$ bits.
+
+\subsection{Incertidumbre de la comparación (Fase 6)}
+
+La tabla T4 reporta $\Delta=-0.1518$ bits a favor de $n=5$ frente a $n=4$, con
+intervalo bootstrap del 95\,\% $[-0.1632,-0.1410]$ basado en $34$ bloques
+contiguos de $2000$ caracteres y $10\,000$ remuestras. El intervalo excluye el
+cero, así que la mejora observada no es compatible con una diferencia nula bajo
+este esquema de remuestreo. Esto concuerda con la pequeña separación entre los
+BPC de prueba de ambos modelos ($2.1538$ frente a $2.3049$ bits).
+
+Se remuestrean bloques y no caracteres individuales porque los caracteres no
+son intercambiables: la cadena de Markov genera dependencia local y un
+bootstrap de caracteres destruiría precisamente la estructura que el modelo
+intenta aprovechar, subestimando la variabilidad. Los bloques contiguos de
+$2000$ caracteres conservan esa dependencia a corto plazo y son suficientemente
+largos para que la media de bloque sea estable. El último bloque tiene menos
+caracteres que los demás, pero su contribución se promedia por su longitud, no
+se descarta.
+
+\subsection{Pendiente de la Persona B}
+
+\textbf{[Por completar: Persona B]} Debe responder las preguntas en cursiva de
+las fases 3 y 5: por qué cambia $\alpha$ con $n$ y qué ocurre con $\alpha=1$ en
+contextos raros; y por qué la distribución estacionaria se parece a las
+frecuencias de unigramas y qué capturan o no las muestras generadas.
 
 \section{Conclusiones}
-Pendiente: 3 a 5 oraciones.
+
+En este corpus el orden $n=5$ con suavizado $\alpha=0.03$ obtuvo el menor BPC
+de validación y también el menor BPC de prueba, $2.1538$ bits por carácter
+($\mathrm{PPL}=4.4499$). La ventaja sobre $n=4$, de $0.1518$ bits, tiene un
+intervalo bootstrap del 95\,\% que excluye el cero. La prueba de
+\emph{abracadabra}, las sumas condicionales y la desigualdad de Gibbs pasaron,
+de modo que las cifras principales son reproducibles. Como limitación, el
+modelo sigue siendo una cadena de Markov sobre caracteres: captura ortografía y
+ritmo local, pero no semántica ni dependencias largas.
 
 \section*{Referencias}
-Pendiente: Marcano, Shannon, Cover \& Thomas, Efron \& Tibshirani,
-y la obra usada.
+
+Dante Alighieri. \emph{La Divina Comedia}, traducción de Manuel Aranda y
+Sanjuán. Barcelona: Empresa Editorial La Ilustración, 1871. Copia en Internet
+Archive: \texttt{https://archive.org/details/ladivinacomedia57303gut}.
+
+Efron, B. y Tibshirani, R. J. (1993). \emph{An Introduction to the Bootstrap}.
+Chapman \& Hall.
+
+Cover, T. M. y Thomas, J. A. (2006). \emph{Elements of Information Theory},
+2.a edición. Wiley.
+
+Marcano, J. \emph{Apuntes de Probabilidad}, sección S01: modelos de lenguaje,
+entropía y bootstrap. Material del curso.
+
+Shannon, C. E. (1948). A Mathematical Theory of Communication.
+\emph{Bell System Technical Journal}, 27, 379--423.
 
 \appendix
+
 \section{Deducción de la MLE}
-Pendiente.
+
+Para un contexto $h$ fijo queremos maximizar
+$\ell(\mathbf{q})=\sum_{y\in\mathcal{V}}c(h,y)\log q(y)$ sujeto a
+$\sum_{y\in\mathcal{V}}q(y)=1$. Con un multiplicador de Lagrange $\lambda$,
+\[
+  \frac{\partial}{\partial q(y)}
+  \left[\sum_{y}c(h,y)\log q(y)+\lambda\left(1-\sum_y q(y)\right)\right]
+  =\frac{c(h,y)}{q(y)}-\lambda=0 .
+\]
+Luego $q(y)=c(h,y)/\lambda$. Imponiendo la restricción,
+$\sum_y c(h,y)/\lambda=1$, de donde $\lambda=c(h)=\sum_y c(h,y)$ y por tanto
+$\hat q(y\mid h)=c(h,y)/c(h)$, que es la fórmula usada en el código. La
+solución es única porque $\ell$ es cóncava en el simplex. Con suavizado
+aditivo se maximiza la misma verosimilitud con un previo de Dirichlet de
+parámetros $\alpha$; la media posterior es la ecuación (2).
 
 \section{Reproducibilidad}
-Pendiente: versiones, semillas, comandos y tiempo de ejecución.
+
+Entorno local: Python 3.14.0, NumPy 2.2.6, Matplotlib 3.10.7. Comandos:
+\begin{verbatim}
+python -m pip install -r requirements.txt
+python codigo/preparar.py
+python codigo/pruebas.py
+python codigo/experimentos.py A
+\end{verbatim}
+El orden de los modelos es $n=1,\dots,5$; los valores de suavizado probados en
+validación son $0.001,0.003,0.01,0.03,0.1,0.3,1$. Los $\alpha$ elegidos por
+validación quedan en \texttt{resultados/alpha_por_n.json}, archivo intermedio
+que se regenera y no se entrega. La semilla del bootstrap es $20261122$ y el
+número de remuestras es $10\,000$. La de la simulación de la Fase 5 la reportará
+Persona B. El bloque de prueba se evaluó una sola vez en
+\texttt{evaluar\_prueba\_una\_vez}; una segunda ejecución de la Fase 4 imprime
+que la prueba no se reevalúa. Solo el flag \texttt{--forzar-prueba} permite
+regenerarla deliberadamente, y no se usó para elegir $n$ ni $\alpha$.
 
 \section{Muestras generadas y declaración de IA}
-Pendiente.
+
+\textbf{Muestras (Persona B):} tres cadenas de 300 caracteres de los modelos
+$n=2,3,5$, con la semilla que se reporte en el Anexo B.
+\textbf{[Por completar: Persona B]}
+
+\paragraph{Declaración de uso de IA.}
+Se usó el asistente OpenCode (modelo Big Pickle) para planificar el trabajo,
+redactar el esqueleto de los scripts, revisar las fórmulas y producir borradores
+de texto. Las verificaciones propias fueron: ejecutar \texttt{pruebas.py} y
+cotejar los seis valores de \emph{abracadabra}; comprobar que las condicionales
+suman $1$ con error máximo $1.11\times10^{-16}$; ejecutar dos veces las fases A
+y confirmar que la segunda no reescribe \texttt{metricas\_prueba.csv}; e
+inspeccionar T2, T3 y T4 para que cada cifra del reporte provenga de un archivo
+generado por el código. Ni la fuente ni las cifras se tomaron de la salida del
+asistente sin esta comprobación.
+
+\section*{Tabla de contribución}
+
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Integrante & Código y resultados & Reporte \\
+\hline
+A & Fase 1, 2, 4 y 6; T1--T4, F1, F3, F4 & R1, R3 (parte A), R4, Anexos A--C \\
+B & Fase 3, 5 y 7; F2, F5 y muestras & R2, R3 (parte B), R5 y zip \\
+Ambos & Revisión de \texttt{modelos.py} y \texttt{pruebas.py} & Revisión cruzada \\
+\hline
+\end{tabular}
+\end{center}
 
 \end{document}

@@ -10,22 +10,31 @@ Es el espejo en Internet Archive del Gutenberg eBook #57303; el texto coincide c
 
 ---
 
-## Estado actual (actualizado al crear el esqueleto)
+## Estado actual (actualizado el 2026-11-23)
 
 **Hecho ✅**
-- `T0` fuente aprobada y registrada en `datos/FUENTE.md`.
+- `T0` fuente aprobada y registrada en `datos/FUENTE.md` (archive.org, Gutenberg #57303).
 - `T1` esqueleto del repo, `README.md` y `requirements.txt`.
-- `T2` `codigo/preparar.py`: corpus limpio de **668 786 caracteres**, partición contigua 80/10/10, `|V| = 35`, T1/F1 generados.
+- `T2` `codigo/preparar.py`: corpus limpio de **668 786 caracteres**, partición contigua 80/10/10, `|V| = 35`, `T1.csv`/`F1.pdf` generados.
 - `T3` `codigo/pruebas.py`: `abracadabra` (6 cifras), sumas = 1, Gibbs y $\pi$ convergente. Todo pasa.
 - `T4` `codigo/modelos.py`: API compartida de conteos, MLE, suavizado, BPC/PPL y contexto con prefijo.
+- **Fase 2 (A)**: `resultados/T2.csv`. Contextos observados 1/35/656/5398/23672 para n=1..5; fracción de ceros en validación 0 / 0.000030 / 0.001824 / 0.011199 / 0.039100. La MLE supera a las dos perturbaciones en los 5 órdenes.
+- **Fase 3 (B) ✅**: `fase3_alpha` dibuja `F2.pdf`/`F2.png` y escribe `validacion_alpha.csv`. `α` elegidos: `{1: 1.0, 2: 0.03, 3: 0.1, 4: 0.03, 5: 0.03}`.
+- **Fase 4 (A)**: `resultados/T3.csv`, `F3.pdf`, `F4.pdf` y `metricas_prueba.csv`. Mejor `n` por validación = **5**; BPC de prueba = **2.1538** bits, PPL = **4.4499**. Gibbs: `H(p)=4.1909 <= H(p,q)=4.1925`, `KL=0.0016`.
+- **Fase 6 (A)**: `resultados/T4.csv`. `Δ = -0.1518` bits, IC95% bootstrap `[-0.1632, -0.1410]` con 10 000 remuestras, 34 bloques de 2000 y semilla 20261122. El intervalo **excluye el cero**.
+- Evaluación en prueba ejecutada **una sola vez**: una segunda corrida imprime `la prueba NO se reevalúa`.
+- **Fase 5 (B) ✅**: `P` 35×35 con filas sumando 1 (error `3.331e-16`), `π` convergente en 24 iteraciones (`L1=5.610e-11`), `F5.pdf`, `estacionaria.csv`, `verificacion_simulacion.csv` y 3 muestras de 300 caracteres con semilla `20261123`.
+- **Fase 7 (B, opcional) ✅**: 200 fusiones BPE, `bpe_resultados.csv`: BPC por carácter `2.427847` frente a `2.153786` de la Fase 4.
+- Informe completo en `reportes/reporte.md` (Markdown + LaTeX para Obsidian); el PDF se genera fuera del repo.
+- Pipeline completo verificado: todos los CSV/PNG/PDF salen byte-idénticos al repetirlo (fecha fija en metadatos PDF).
 
 **Pendiente ⚠️**
-- `experimentos.py` tiene TODOS los `NotImplementedError` de las fases 2–7.
-- Faltan `T2.csv`, `T3.csv`, `T4.csv`, `F2.pdf`, `F3.pdf`, `F4.pdf`, `F5.pdf` y `metricas_prueba.csv`.
-- `reportes/reporte.tex` es solo plantilla; no existe `reporte.pdf`.
-- Falta el zip `P1_EquipoNN_Apellido1_Apellido2.zip`.
+- Convertir `reportes/reporte.md` a `reporte.pdf` (usa las imágenes `resultados/F*.png`).
+- Completar portada con número de equipo, apellidos, cédulas y profesor.
+- Copiar el PDF convertido a `reporte.pdf` en la raíz y ejecutar `python empaquetar.py --equipo NN --apellido1 ... --apellido2 ...`.
+- `resultados/alpha_por_n.json` es intermedio: se regenera y **no** se entrega en el zip.
 
-**No entregar en el zip:** `datos/raw/`, `datos/corpus/`, `__pycache__/`, este `PLAN.md`.
+**No entregar en el zip:** `datos/raw/`, `datos/corpus/`, `__pycache__/`, `PLAN.md`, `alpha_por_n.json`, `reportes/` (excepto el `reporte.pdf` ya convertido, que va en la raíz), `F*.png`.
 
 ---
 
@@ -36,7 +45,7 @@ Es el espejo en Internet Archive del Gutenberg eBook #57303; el texto coincide c
 | Integrante | Código / experimentos | Reporte | Entregables propios |
 |---|---|---|---|
 | **Persona A (tú)** | **Fase 1** (`T1.csv`, `F1.pdf`) ✅ ya hecha: limpieza, normalización y partición.<br>**Fase 2** (`T2.csv`) ⚠️: MLE, ceros, log-verosimilitud y perturbaciones.<br>**Fase 4** (`T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`) ⚠️: elección de `n`, Gibbs, promedio acumulado.<br>**Fase 6** (`T4.csv`) ⚠️: bootstrap por bloques. | **R1**: portada, resumen, Introducción, Marco probabilístico y Datos (T1/F1).<br>**R3**: mitad de la Discusión.<br>**R4**: Conclusiones, Referencias, Anexo A, Anexo B, Anexo C. | `T1.csv`, `F1.pdf`, `T2.csv`, `T3.csv`, `T4.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv`, secciones 1–3 y 8 del reporte. |
-| **Persona B (compañero)** | **Fase 3** (`F2.pdf`) ⚠️: suavizado y elección de `α`.<br>**Fase 5** (`F5.pdf`) ⚠️: matriz `P`, $\pi$, muestras con semilla.<br>**Fase 7 opcional** (+10) ⚠️: BPE y BPC por carácter. | **R2**: Métodos, Resultados (T2–T4 y F2–F5 citados) y Verificaciones.<br>**R3**: otra mitad de la Discusión.<br>**R5**: armar el zip y probar reproducibilidad. | `F2.pdf`, `F5.pdf`, Anexo C (muestras), secciones 4–6 del reporte, zip final. |
+| **Persona B (compañero)** | **Fase 3** (`F2.pdf`) ✅: suavizado y elección de `α`.<br>**Fase 5** (`F5.pdf`) ✅: matriz `P`, $\pi$, muestras con semilla.<br>**Fase 7 opcional** (+10) ✅: BPE y BPC por carácter. | **R2**: Métodos, Resultados (T2–T4 y F2–F5 citados) y Verificaciones.<br>**R3**: otra mitad de la Discusión.<br>**R5**: zip (PDF lo genera el usuario). | `F2.pdf`, `F5.pdf`, Anexo C (muestras), secciones 4–6 del reporte, zip final. |
 | **Ambos** | `T3` (`pruebas.py`) y `T4` (`modelos.py`) ✅ ya compartidas: cualquiera puede modificarlas, pero avisando al otro. | Revisión cruzada de todo el reporte; tabla de contribución al final; Anexo C con la declaración de IA. | Sincronización y coherencia de cifras. |
 
 **Mapa completo por fase — ninguna queda fuera**
@@ -44,14 +53,14 @@ Es el espejo en Internet Archive del Gutenberg eBook #57303; el texto coincide c
 | Fase | Responsable | Estado | Entregable principal |
 |---|---|---|---|
 | 1. Explorar corpus | A | ✅ Hecha | `T1.csv`, `F1.pdf`, `datos/corpus/` |
-| 2. MLE y ceros | A | ⚠️ Pendiente | `T2.csv` |
-| 3. Suavizado y `α` | B | ⚠️ Pendiente | `F2.pdf` |
-| 4. Prueba, Gibbs y métricas | A | ⚠️ Pendiente | `T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv` |
-| 5. Simulación y $\pi$ | B | ⚠️ Pendiente | `F5.pdf`, muestras del Anexo C |
-| 6. Bootstrap | A | ⚠️ Pendiente | `T4.csv` |
-| 7. BPE (opcional, +10) | B | ⚠️ Pendiente | BPC por carácter |
-| Verificaciones | Ambos | ✅ Hechas | `pruebas.py` |
-| Reporte R1–R5 | A + B | ⚠️ Pendiente | `reporte.pdf` y zip |
+| 2. MLE y ceros | A | ✅ Hecha | `T2.csv` |
+| 3. Suavizado y `α` | B | ✅ Hecha | `F2.pdf` |
+| 4. Prueba, Gibbs y métricas | A | ✅ Hecha | `T3.csv`, `F3.pdf`, `F4.pdf`, `metricas_prueba.csv` |
+| 5. Simulación y $\pi$ | B | ✅ Hecha | `F5.pdf`, muestras del Anexo C |
+| 6. Bootstrap | A | ✅ Hecha | `T4.csv` |
+| 7. BPE (opcional, +10) | B | ✅ Hecha | `bpe_resultados.csv` |
+| Verificaciones | Ambos | ✅ Hechas | `pruebas.py` + `verificacion_simulacion.csv` |
+| Reporte R1–R5 | A + B | ✅ Redacción completa en `reportes/reporte.md`; ⚠️ falta convertir a PDF y armar el zip | `reporte.pdf` y zip |
 
 **Reglas de coordinación**
 
