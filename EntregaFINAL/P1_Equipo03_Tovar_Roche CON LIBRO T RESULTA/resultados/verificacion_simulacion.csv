@@ -1,0 +1,11 @@
+metrica,valor,unidad_o_tolerancia
+alpha_bigrama,0.03,sin unidad
+dimension_P,35x35,simbolos
+max_error_sumas_filas,3.331e-16,tolerancia 1e-12
+min_entrada_P,3.509e-07,probabilidad > 0
+iteraciones_potencias,24,iteraciones
+norma_l1_final,5.610e-11,tolerancia 1e-10
+max_diferencia_pi_vs_unigramas,0.000009,probabilidad
+semilla_simulacion,20261123,entero
+longitud_muestra,300,caracteres
+contexto_inicial, que ,caracteres

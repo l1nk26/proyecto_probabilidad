@@ -1,0 +1,8 @@
+metrica,valor,unidad
+entrenamiento,535028,caracteres
+validacion,66879,caracteres
+prueba,66879,caracteres
+total,668786,caracteres
+vocabulario,35,simbolos
+H_train,4.1992,bits/simbolo
+H_max,5.1293,bits/simbolo

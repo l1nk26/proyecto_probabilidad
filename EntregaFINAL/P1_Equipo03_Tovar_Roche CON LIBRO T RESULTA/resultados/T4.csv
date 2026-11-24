@@ -1,0 +1,11 @@
+metrica,valor,unidad
+mejor_n,5,orden
+n_comparado,4,orden
+numero_bloques,34,bloques
+tamano_bloque,2000,caracteres
+media_delta,-0.151797,bits/carácter
+IC95_inferior,-0.163172,bits/carácter
+IC95_superior,-0.140998,bits/carácter
+remuestras,10000,réplicas
+semilla,20261122,entero
+intervalo_excluye_cero,1,booleano

@@ -1,0 +1,6 @@
+n,contextos_observados,pares_observados,max_error_sumas,caracteres_validacion,ceros_validacion,fraccion_ceros_validacion,log2_verosimilitud_train,log2_verosimilitud_pert1,log2_verosimilitud_pert2,delta,contexto_perturbado,simbolo_origen,destino_1,destino_2
+1,1,35,0.000e+00,66879,0,0.000000,-2246683.4227,-2247291.6974,-2247332.9410,0.01,, ,e,a
+2,35,656,0.000e+00,66879,2,0.000030,-1740981.3494,-1741104.1434,-1741110.6891,0.01, ,d,e,a
+3,656,5398,1.110e-16,66879,122,0.001824,-1452309.3304,-1452329.6431,-1452334.2530,0.01,\#\#,#, ,e
+4,5398,23672,1.110e-16,66879,749,0.011199,-1186858.9667,-1186867.6063,-1186876.2864,0.01,\#\#\#,#, ,e
+5,23672,66833,1.110e-16,66879,2615,0.039100,-960983.0723,-960988.8387,-960994.4501,0.01,\#\#\#\#,#, ,e
